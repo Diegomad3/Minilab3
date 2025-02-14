@@ -1,0 +1,36 @@
+I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv {1 {vlog -work work -vopt -sv -stats=none I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv
+Questa Intel Starter FPGA Edition-64 vlog 2023.3 Compiler 2023.07 Jul 17 2023
+-- Compiling module driver
+
+Top level modules:
+	driver
+
+} {} {}} I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv {1 {vlog -work work -vopt -sv -stats=none I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv
+Questa Intel Starter FPGA Edition-64 vlog 2023.3 Compiler 2023.07 Jul 17 2023
+-- Compiling module spart_tx
+
+Top level modules:
+	spart_tx
+
+} {} {}} I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv {1 {vlog -work work -vopt -sv -stats=none I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv
+Questa Intel Starter FPGA Edition-64 vlog 2023.3 Compiler 2023.07 Jul 17 2023
+-- Compiling module spart_baud_gen
+
+Top level modules:
+	spart_baud_gen
+
+} {} {}} I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v {1 {vlog -work work -vopt -stats=none I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v
+Questa Intel Starter FPGA Edition-64 vlog 2023.3 Compiler 2023.07 Jul 17 2023
+-- Compiling module spart
+
+Top level modules:
+	spart
+
+} {} {}} I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv {1 {vlog -work work -vopt -sv -stats=none I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv
+Questa Intel Starter FPGA Edition-64 vlog 2023.3 Compiler 2023.07 Jul 17 2023
+-- Compiling module spart_rx
+
+Top level modules:
+	spart_rx
+
+} {} {}}

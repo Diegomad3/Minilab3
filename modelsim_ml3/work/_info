@@ -1,0 +1,179 @@
+m255
+K4
+z2
+Z0 !s12c _opt
+Z1 !s99 nomlopt
+R0
+R1
+R0
+R1
+R0
+R1
+!s11f vlog 2023.3 2023.07, Jul 17 2023
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/intelFPGA_lite/23.1std
+T_opt
+!s110 1739494593
+V^:od>4[MjPVL4<O9=K]062
+04 8 4 work spart_tb fast 0
+=6-4cd71793bb8e-67ae94c0-39d-5b34
+R1
+!s12b OEM100
+!s124 OEM10U10 
+o-quiet -auto_acc_if_foreign -work work +acc
+Z2 tCvgOpt 0
+n@_opt
+OL;O;2023.3;77
+vdriver
+2I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv
+Z3 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+!s110 1739491766
+!i10b 1
+!s100 oXYMc@;NNaddIhRZ0gJL01
+IP4@zKaTn?WPFoXDC<QPh43
+S1
+Z4 dI:/Desktop/ECE554/Minilab3/modelsim_ml3
+w1739491760
+8I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv
+FI:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv
+!i122 7
+L0 20 105
+Z5 VDg1SIo80bB@j0V0VzS_@n1
+Z6 OL;L;2023.3;77
+r1
+!s85 0
+31
+!s108 1739491765.000000
+!s107 I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|I:/Desktop/ECE554/Minilab3/Lab1-SPART/driver.sv|
+!i113 0
+Z7 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R2
+vspart
+2I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v
+!s110 1739490835
+!i10b 1
+!s100 @2A;=Yc`PIWIkM844i2W21
+Izb2QC05dN6Hh<oo]zW:J90
+R4
+w1739490830
+8I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v
+FI:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v
+!i122 6
+L0 20 47
+R5
+R6
+r1
+!s85 0
+31
+!s108 1739490835.000000
+!s107 I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart.v|
+!i113 0
+o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R2
+vspart_baud_gen
+2I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv
+R3
+!s110 1739490663
+!i10b 1
+!s100 28DH;Be;8hO@k:;ObaMEA2
+I19876`4jJ1d=L1Hj4VRge1
+S1
+R4
+w1739490658
+8I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv
+FI:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv
+!i122 4
+L0 1 51
+R5
+R6
+r1
+!s85 0
+31
+!s108 1739490663.000000
+!s107 I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_baud_gen.sv|
+!i113 0
+R7
+R2
+vspart_rx
+2I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv
+R3
+!s110 1739490572
+!i10b 1
+!s100 PY;W8I_bTO44=1_LeaGB]2
+I[dS<Mec3DeoaQ94G]z;Fj3
+S1
+R4
+w1739490567
+8I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv
+FI:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv
+!i122 2
+L0 1 98
+R5
+R6
+r1
+!s85 0
+31
+!s108 1739490572.000000
+!s107 I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_rx.sv|
+!i113 0
+R7
+R2
+vspart_tb
+2I:/Desktop/ECE554/Minilab3/spart_tb.sv
+R3
+!s110 1739494588
+!i10b 1
+!s100 @BjH`<bAdciz49hR3QQWI0
+I=if94?G;0^oSXfgJ:0N]S3
+S1
+R4
+w1739494582
+8I:/Desktop/ECE554/Minilab3/spart_tb.sv
+FI:/Desktop/ECE554/Minilab3/spart_tb.sv
+!i122 12
+L0 2 84
+R5
+R6
+r1
+!s85 0
+31
+!s108 1739494588.000000
+!s107 I:/Desktop/ECE554/Minilab3/spart_tb.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|I:/Desktop/ECE554/Minilab3/spart_tb.sv|
+!i113 0
+R7
+R2
+vspart_tx
+2I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv
+R3
+!s110 1739490573
+!i10b 1
+!s100 _<mab6AdQB26I?g=_eboM2
+IMhjNfhVA`IEDGka3:5ini0
+S1
+R4
+w1739490425
+8I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv
+FI:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv
+!i122 3
+L0 1 82
+R5
+R6
+r1
+!s85 0
+31
+!s108 1739490573.000000
+!s107 I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|I:/Desktop/ECE554/Minilab3/Lab1-SPART/spart_tx.sv|
+!i113 0
+R7
+R2
