@@ -60,21 +60,6 @@ module driver(
         divisor_high = baud_divisor[15:8];
     end
 	
-	    // Map br_cfg to baud divisor values
-    always @(*) begin
-        case (br_cfg)
-            2'b00: baud_divisor = 16'd325; // 4800 baud
-            2'b01: baud_divisor = 16'd162; // 9600 baud
-            2'b10: baud_divisor = 16'd81;  // 19200 baud
-            2'b11: baud_divisor = 16'd40;  // 38400 baud
-            default: baud_divisor = 16'd162; // Default to 9600 baud
-        endcase
-
-        // Split the 16-bit divisor into high and low bytes
-        divisor_low = baud_divisor[7:0];
-        divisor_high = baud_divisor[15:8];
-    end
-
     // State machine states
   /*  typedef enum {
         IDLE,
@@ -91,6 +76,7 @@ module driver(
 	parameter READ_STATUS       = 3'b011;
 	parameter READ_DATA         = 3'b100;
 	parameter WRITE_DATA        = 3'b101;
+    parameter TRANSMITTING        = 3'b110;
 
 	reg [2:0] current_state, next_state;
 
@@ -147,7 +133,7 @@ module driver(
             end
 
             READ_STATUS: begin
-                iocs = 1'b1; // Select SPART
+                iocs = 1'b0; // Select SPART no really needed
                 iorw = 1'b1; // Read operation
                 ioaddr = 2'b01; // Address for Status Register
                 next_state = IDLE;
@@ -166,7 +152,15 @@ module driver(
                 ioaddr = 2'b00; // Address for Transmit Buffer
                 data_out = receive_buffer_flopped; // data to transmit
                 data_out_en = 1'b1; // Enable DATABUS output
-                next_state = IDLE;
+                next_state = TRANSMITTING;
+            end
+
+            TRANSMITTING: begin
+                iocs = 1'b1; // Select SPART
+                iorw = 1'b0; // Write operation
+                ioaddr = 2'b00; // Address for Transmit Buffer
+                if(tbr == 1)
+                    next_state = IDLE;
             end
 
             default: begin

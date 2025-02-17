@@ -35,6 +35,9 @@ module spart(
     wire baud_clk;
     wire en_tx, en_rx;
     wire [7:0] rx_data;
+    wire [7:0]status_reg;
+
+    assign status_reg = {6'b0,tbr,rda};
 
     // Baud rate generator enable and clear logic
     assign en_baud = (en_tx || en_rx || (ioaddr == 2'b10 || ioaddr == 2'b11)) ? 1'b1 : 1'b0; // Enable for Division Buffers
@@ -78,6 +81,6 @@ module spart(
     );
 
     // DATABUS control for reading received data
-    assign databus = (iocs && ioaddr == 2'b00 && iorw == 1'b1) ? rx_data : 8'bzzzzzzzz;
+    assign databus = (iocs && ioaddr == 2'b00 && iorw == 1'b1) ? ((~iocs) && ioaddr == 2'b01 && iorw == 1'b1) ? status_reg : rx_data : 8'bzzzzzzzz;
 
 endmodule

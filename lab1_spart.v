@@ -23,7 +23,7 @@ module lab1_spart(
     input        [3:0]  KEY,
 
  //////////// LED //////////
-    output		   [9:0]		LEDR,
+    output		 [9:0]	LEDR,
 
  //////////// SW //////////
     input        [9:0]  SW,
