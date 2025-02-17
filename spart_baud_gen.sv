@@ -1,51 +1,53 @@
 module spart_baud_gen(
-    input clk,
-    input rst,
-    input [1:0] ioaddr,
-    input [7:0] databus,
-    input en,
-    input clr,
-    output baud_clk
-)
-    reg [15:0] baud_buffer_divisor //Value to count down from for the baud rate. 
-    reg [15:0] baud_cnt;           // Counter for baud rate timing
-    reg [3:0]  bit_cnt;            // Counter to track the number of bits sent
+    input clk,               // Clock signal
+    input rst,               // Active-high reset
+    input [1:0] ioaddr,      // Address bus to select high/low byte of divisor
+    input [7:0] databus,     // Data bus to load divisor
+    input en,                // Enable signal for baud rate generation
+    input clr,               // Clear signal to reset the counter
+    output reg baud_clk      // Baud clock output
+);
 
-    // Set or update the Baud rate of the spart.
-    always @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            baud_buffer_divisor <= 16'h0000;      // Reset baud counter
-        else if (ioaddr == 2'b10)
-            baud_buffer_divisor[7:0] <= databus[7:0];    
-        else if (ioaddr == 2'b11)
-            baud_buffer_divisor[15:7] <= databus[7:0];
+    reg [15:0] baud_buffer_divisor; // Divisor value for baud rate
+    reg [15:0] baud_cnt;            // Counter for baud rate timing
+
+    // === Divisor Loading Logic ===
+    // Load the high or low byte of the divisor based on ioaddr
+    always @(posedge clk or negedge rst) begin
+        if (!rst)
+            baud_buffer_divisor <= 16'd325; // default to 4800 baud
+        else if (en) begin
+            if (ioaddr == 2'b10)
+                baud_buffer_divisor[7:0] <= databus; // Load low byte
+            else if (ioaddr == 2'b11)
+                baud_buffer_divisor[15:8] <= databus; // Load high byte
+        end
     end
 
-    // Down counter for the baud rate. Will transmit after counted down from baud_buffer_divisor
-    always @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            baud_cnt <= 16'h0000;         // Reset baud counter
-        else if (clr | shift)
-            baud_cnt <= baud_buffer_divisor;         // Reset baud counter at the start of transmission or after a shift
-        else if (en)
-            baud_cnt <= baud_cnt - 1 ;   // Increment counter while transmitting. Set after 16 samples/
-    end
-    // Generate the shift signal when the baud counter reaches the baud period (2604 in this case)
-    assign shift = (baud_cnt == 16'h0000) ? 1'b1 : 1'b0;
-
-    // === Bit Counter Logic ===
-    // Counts the total number of bits transmitted in the current frame
-    always @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            bit_cnt <= 4'h0;            // Reset bit counter
+    // === Baud Rate Counter Logic ===
+    // Down counter for baud rate timing
+    always @(posedge clk or negedge rst) begin
+        if (!rst)
+            baud_cnt <= 16'h0000; // Reset counter on reset
         else if (clr)
-            bit_cnt <= 4'h0;            // Reset bit counter at the start of transmission
-        else if (shift)
-            bit_cnt <= bit_cnt + 1;     // Increment counter on each shift
+            baud_cnt <= baud_buffer_divisor; // Reload divisor on clear
+        else if (en) begin
+            if (baud_cnt == 16'h0000)
+                baud_cnt <= baud_buffer_divisor; // Reload divisor when counter reaches 0
+            else
+                baud_cnt <= baud_cnt - 1; // Decrement counter
+        end
     end
 
-    // Check if all bits of the frame (10 bits: 1 start, 8 data, 1 stop) have been transmitted
-    assign baud_clk = (bit_cnt == 4'b1111) ? 1'b1 : 1'b0;
-
+    // === Baud Clock Generation ===
+    // Generate baud_clk when the counter reaches 0
+    always @(posedge clk or negedge rst) begin
+        if (!rst)
+            baud_clk <= 1'b0; // Reset baud clock on reset
+        else if (en && baud_cnt == 16'h0000)
+            baud_clk <= 1'b1; // Assert baud_clk when counter reaches 0
+        else
+            baud_clk <= 1'b0; // Deassert baud_clk otherwise
+    end
 
 endmodule

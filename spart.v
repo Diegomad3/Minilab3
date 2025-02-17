@@ -28,39 +28,56 @@ module spart(
     inout [7:0] databus,
     output txd,
     input rxd
+);
+
+    // Internal signals
+    wire en_baud, clr_baud;
+    wire baud_clk;
+    wire en_tx, en_rx;
+    wire [7:0] rx_data;
+
+    // Baud rate generator enable and clear logic
+    assign en_baud = (en_tx || en_rx || (ioaddr == 2'b10 || ioaddr == 2'b11)) ? 1'b1 : 1'b0; // Enable for Division Buffers
+    assign clr_baud = ((iocs == 1'b0) && (en_rx == 1'b0)) ? 1'b1 : 1'b0; // Clear when SPART is not selected
+
+    // Instantiate the baud rate generator
+    spart_baud_gen BAUD_GEN(
+        .clk(clk),
+        .rst(rst),
+        .ioaddr(ioaddr),
+        .databus(databus),
+        .en(en_baud),
+        .clr(clr_baud),
+        .baud_clk(baud_clk)
     );
-wire en_baud, clr_baud;
-assign en_baud = (ioaddr == 1'b00) ? 1'b1 : 1'b0;
-assign clr_baud = (iocs == 1'b0) ? 1'b0 : 1'b1;
-spart_baud_gen BAUD_GEN(
-    .clk(clk),
-    .rst(rst),
-    .ioaddr(ioaddr) ,
-    .databus(databus),
-    .en(en_baud),
-    .clr(clr_baud),
-    .baud_clk(baud_clk)
-);
-assign en_tx = (ioaddr == 1'b00) ? (iorw = 1'b0) : 1'b1 : 1'b0;
-spart_tx TX(
-    .clk(clk),
-    .rst(rst),
-    .en(en_tx),
-    .baud_clk(baud_clk),
-    .tx_data(databus),
-    .txd(txd),
-    .tbr(tbr)
-);
-assign en_tx = (ioaddr == 1'b00) ? (iorw = 1'b1) : 1'b1 : 1'b0;
-spart_rx RX(
-    .clk(clk),
-    .rst(rst),
-    .en(en_rx),
-    .baud_clk(baud_clk),
-    .rx_data(rx_data),
-    .rxd(rxd),
-    .rda(rda)
-);
-assign databus = rda == 1'b1 ? rx_data : databus;
+
+    // Transmit logic
+    assign en_tx = (iocs && ioaddr == 2'b00 && iorw == 1'b0) ? 1'b1 : 1'b0; // Enable TX when writing to Transmit Buffer
+
+    spart_tx TX(
+        .clk(clk),
+        .rst(rst),
+        .en(en_tx),
+        .baud_clk(baud_clk),
+        .tx_data(databus),
+        .txd(txd),
+        .tbr(tbr)
+    );
+
+    // Receive logic
+    //assign en_rx = (iocs && ioaddr == 2'b00 && iorw == 1'b1) ? 1'b1 : 1'b0; // Enable RX when reading from Receive Buffer
+
+    spart_rx RX(
+        .clk(clk),
+        .rst(rst),
+        .en(en_rx),
+        .baud_clk(baud_clk),
+        .rx_data(rx_data),
+        .rxd(rxd),
+        .rda(rda)
+    );
+
+    // DATABUS control for reading received data
+    assign databus = (iocs && ioaddr == 2'b00 && iorw == 1'b1) ? rx_data : 8'bzzzzzzzz;
 
 endmodule
