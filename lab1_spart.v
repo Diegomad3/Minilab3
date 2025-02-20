@@ -23,7 +23,7 @@ module lab1_spart(
     input        [3:0]  KEY,
 
  //////////// LED //////////
-    output		   [9:0]		LEDR,
+    output		 [9:0]	LEDR,
 
  //////////// SW //////////
     input        [9:0]  SW,
@@ -43,7 +43,7 @@ wire [7:0] databus;
 wire [1:0] br_cfg;
 
 // press button[0] to generate a low active reset signal
-wire rst = ~KEY[0];
+wire rst = KEY[0];
 
 // LED[9] : indicator for RX signal
 // LED[8] : indicator for TX signal

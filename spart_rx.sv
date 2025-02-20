@@ -1,25 +1,33 @@
 module spart_rx(
     input clk,
     input rst,
-    input en,
     input baud_clk,
     input rxd,
-    output [7:0] rx_data,
-    output rda
-)
+	output logic en,
+    output logic [7:0] rx_data,
+    output logic rda
+);
 
 
     // Flops for metastability prevention
-    reg rxd_FF1, rxd_FF2;
-    
-    wire done;
+    logic rxd_FF1, rxd_FF2, enable, start, done, set_rdy, receiving, rdy_reg1, rdy_reg2;
+	logic [3:0] bit_cnt;
+	
+	//assign en = enable || receiving;
+    assign en = 1'b1;
+	
+	// === State Machine ===
+    typedef enum reg {IDLE, RECEIVE} state_t; // Define states: IDLE and RECEIVE
 
+    state_t state, nxt_state; // Current and next state
+
+    
      // Shift register for received data
-    reg [8:0] rx_shft_reg;    // Shift register for serial-to-parallel conversion (9 bits for stop/start bits)
+    logic [8:0] rx_shft_reg;    // Shift register for serial-to-parallel conversion (9 bits for stop/start bits)
 
     // Double-flop the RX input to prevent metastability issues
-    always @(posedge clk, negedge rst_n)
-        if (!rst_n) begin
+    always_ff @(posedge clk, negedge rst)
+        if (!rst) begin
             rxd_FF1 <= 1'b1;       // Default idle state for RX is high
             rxd_FF2 <= 1'b1;
         end
@@ -27,42 +35,62 @@ module spart_rx(
             rxd_FF1 <= rxd;      // First flip-flop captures RX
             rxd_FF2 <= rxd_FF1; // Second flip-flop synchronizes RX to the clock domain
         end
-
+     
+	//assign enable = (rxd_FF2 !== rxd_FF1) && (state !== RECEIVE);
         // === Shift Register Logic ===
     // Serial-to-parallel conversion of received data
-    always @(posedge clk, negedge rst_n)
-        if (!rst_n)
+    always_ff @(posedge clk, negedge rst) begin
+        if (!rst)
             rx_shft_reg <= 9'h1FF; // Default all bits high
         else if (baud_clk)
             rx_shft_reg <= {rxd_FF2, rx_shft_reg[8:1]}; // Shift in the RX signal (LSB first)
-
+        else if (start)
+            rx_shft_reg <= 9'h1FF; // Default all bits high
+    end
      // Extract the 8-bit data from the shift register
     assign rx_data = rx_shft_reg[7:0];
+	
+	 // === Bit Counter Logic ===
+    // Count the number of bits received in the current frame
+    always_ff @(posedge clk, negedge rst)
+        if (!rst)
+            bit_cnt <= 4'h0; // Reset bit counter
+        else if (start)
+            bit_cnt <= 4'h0; // Start a new frame, already counting start bit
+        else if (baud_clk && receiving)
+            bit_cnt <= bit_cnt + 1; // Increment bit counter after each shift
 
-    // === State Machine ===
-    typedef enum reg {IDLE, RECEIVE} state_t; // Define states: IDLE and RECEIVE
+    // Determine when the reception of the frame is complete
+    assign done = (bit_cnt == 4'b1010) ? 1'b1 : 1'b0; // Done after receiving 10 bits (1 start, 8 data, 1 stop)
 
-    state_t state, nxt_state; // Current and next state
 
     // State transition logic
-    always @(posedge clk, negedge rst_n)
-        if (!rst_n)
+    always_ff @(posedge clk, negedge rst) begin
+        if (!rst) begin
             state <= IDLE; // Reset to IDLE state
-        else
+			enable  <= 0;
+		end	
+        else begin
             state <= nxt_state; // Transition to the next state
-
+			enable <= (rxd_FF2 !== rxd_FF1) && (state !== RECEIVE);
+		end	
+	end
     // Next-state logic and control signal generation
-    always @(*) begin
+    always_comb begin
         // Default values for control signals
         set_rdy = 0;
+		start = 0;
+		receiving = 0;
         nxt_state = state;
 
         case (state)
-            IDLE: if (~rxd_FF2 & en) begin  // Detect start bit (RX goes low)
+            IDLE: if (enable) begin  // Detect start bit (RX goes low)
+					start = 1;
                     nxt_state = RECEIVE; // Move to RECEIVE state
                   end
 
             RECEIVE: begin
+						receiving = 1;
                         if (done) begin // If the frame is complete
                             receiving = 0;
                             set_rdy = 1; // Set the ready flag
@@ -75,23 +103,26 @@ module spart_rx(
     end
     
     // Generate the ready signal (`rdy`) to indicate valid data is available
-    always_ff @(posedge clk, negedge rst_n)
-        if (!rst_n)
-            rdy_reg <= 1'b0; // Reset the ready signal
-        else if (set_rdy)
-            rdy_reg <= 1'b1; // Set the ready signal when data is received
-    // === Rx Counter Logic ===
-    // Counts the total number of bits transmitted in the current frame
-    always @(posedge baud_clk, negedge rst_n) begin
-        if (!rst_n )
-            rx_buffer_cnt <= 4'h0;            // Reset bit counter
-        else if (state == RECEIVE)
-            rx_buffer_cnt <= rx_buffer_cnt + 1;     // Increment counter on each shift
-        if (rx_buffer_cnt == 4'h7) begin
-            done <= 1'b1;
-            rx_buffer_cnt = 4'h0;
-        end
+    always_ff @(posedge clk, negedge rst) begin
+        if (!rst) begin
+		// Reset the ready signal
+			rdy_reg1 <= 1'b0;
+			rdy_reg2 <= 1'b0;
+		end	
+        else if (set_rdy)begin
+            rdy_reg1 <= 1'b1;
+			rdy_reg2 <= rdy_reg1; // Set the ready signal when data is received
+		end	
+		else if (enable) begin
+			rdy_reg1 <= 1'b0;
+			rdy_reg2 <= 1'b0;  // Clear on next start bit (new frame)
+		end
+		else begin
+			rdy_reg1 <= 1'b0;
+			rdy_reg2 <= rdy_reg1;
+		end	
     end
 	// Assign output rdy from the rdy flop		
-	assign rda = rdy_reg;
+	assign rda = rdy_reg1 || rdy_reg2;
+    //assign rda = (bit_cnt == 4'b1010);
 endmodule
